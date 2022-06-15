@@ -1,6 +1,6 @@
 <img src="https://app.noapicode.com/logo.png" alt="drawing" width="250"/>
 
-## [NoAPIcode](https://www.noapicode.com/#/)
+# [NoAPIcode](https://www.noapicode.com/#/)
 
 Consume API's with no code.
 
@@ -10,7 +10,9 @@ Connect Once, use across all platforms.
 
 # Documentation
 
-### JavaScript:
+## JavaScript:
+
+[npm](https://www.npmjs.com/package/noapicode)
 
 ```[bash]
 npm install noapicode
@@ -28,7 +30,9 @@ Example Usage:
        })
 ```
 
-### Python:
+## Python:
+
+[pypi](https://pypi.org/project/noapicode/)
 
 ```[bash]
 pip install noapicode
