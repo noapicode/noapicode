@@ -6,7 +6,7 @@ Consume API's with no code.
 
 Connect Once, use across all platforms.
 
-[Tutorial](https://www.youtube.com/watch?v=w5vroevzpzi)
+[Tutorial](https://www.youtube.com/watch?v=w5vROeVzpZI)
 
 # Documentation
 
