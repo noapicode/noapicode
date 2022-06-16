@@ -1,8 +1,6 @@
 const axios = require('axios')
-fs = require('fs')
-
+const fs = require('fs')
 const { promisify } = require('util')
-
 const readFileAsync = promisify(fs.readFile)
 
 let _actions = null
@@ -10,6 +8,7 @@ let _envs = null
 let _loadingFile = null
 
 async function load(pathToFile) {
+
     _loadingFile = loadFile(pathToFile)
     await _loadingFile
     return "Successfully loaded " + pathToFile
@@ -22,10 +21,10 @@ async function loadFile(pathToFile) {
     _actions = fileJSON["actions"]
     _envs = fileJSON["env"]
     return false
-
 }
 
 async function request(apiName, variables={}, env="default", folder="default") {
+
         if (_loadingFile)
             await _loadingFile
         
@@ -33,26 +32,28 @@ async function request(apiName, variables={}, env="default", folder="default") {
             throw new Error("No Actions Loaded, First Call the 'load' method")
 
         var data = _initActionData(folder + '/' + apiName, {}, variables, env)    
-
         _configureHTTPVariables(data)
-
         vendorResponse = await _makeRequest(data)
 
         return vendorResponse
-    
 }
-    // Get Input Ready for HTTP Request
-function _parseVariables( variable) {
-       /*
-        return object is 
-        {
-            "variableName1": [startIndex,endIndex],
-            "variableName2": [startIndex,endIndex],
-        }
-       */
+
+function _parseVariables(variable) {
+/* 
+Get Input Ready for HTTP Request
+       
+return object is
+
+    {
+        "variableName1": [startIndex, endIndex],
+        "variableName2": [startIndex, endIndex],
+    }
+*/
        tokens = {}
        previousTotal = 0
+
        while (_getIndex(variable,"(") != -1) {
+
           startIndex = _getIndex(variable,"(")
           token = variable.substring(startIndex + 1)
           endIndex = _getIndex(token,")")
@@ -62,17 +63,17 @@ function _parseVariables( variable) {
           variable = variable.substring(variable.indexOf("(" + token + ")") + 2 + token.length)
         }
        return tokens
-    }
+}
 
-function _insertVariables( variableDict, valuesDict, str) {
-        var newURL = str
-
-        /* when we change the length of array, we need to fix indexes
+function _insertVariables(variableDict, valuesDict, str) {
+/* 
+        when we change the length of array, we need to fix indexes
          we need to look at the difference in size of what we took out vs in 
          add that to the index
          if we had x and we add xx then 2 - 1 is 1 and we add 1 
-         len(varValue) - len (varName)
-        */
+         len(varValue) - len (varName) is offset
+*/
+        var newStr = str
         var offset = 0
         for (var i in variableDict) {
             var value = ''
@@ -84,14 +85,14 @@ function _insertVariables( variableDict, valuesDict, str) {
             leftIndex = variableDict[i][1] + 2 + offset
             offset += ( value.length -  i.length)
 
-            newURL = str.substring(0,rightIndex)
-            newURL += value
+            newStr = str.substring(0,rightIndex)
+            newStr += value
             if (str.length > leftIndex)
-                newURL += str.substring(leftIndex)
-            str = newURL
+                newStr += str.substring(leftIndex)
+            str = newStr
         }
-        return newURL
-    }
+        return newStr
+}
 
 function _configureHTTPVariables( data) {
 
@@ -99,8 +100,11 @@ function _configureHTTPVariables( data) {
         data["url"] = _insertVariables(urlVars, data["inputParams"], data["url"])
         
         if (data["urlParams"] != null) {
+
             data["url"] += '?'
+
             for (var k in data["urlParams"]) {
+
                 if (data["urlParams"][k] == null)
                     data["url"] += k + '=' + encodeURIComponent(data["inputParams"][k]) + "&"
                 else
@@ -116,7 +120,8 @@ function _configureHTTPVariables( data) {
 
         if (data["headers"] != null) {
             newHeaders = {}
-            for (var k in data["headers"]){
+            for (var k in data["headers"]) {
+
                 keyVars = _parseVariables(k)
                 newKey = _insertVariables(keyVars, data["inputParams"],k)
                 valueVars = _parseVariables(data["headers"][k])
@@ -127,7 +132,10 @@ function _configureHTTPVariables( data) {
         }
 
 }
-    // Methods that make HTTP Request
+
+
+// Methods that make HTTP Request
+
 async function _makeRequest(data,response=null) {
 
         var currentAttempt = 0
@@ -140,6 +148,7 @@ async function _makeRequest(data,response=null) {
             try {
                 var req = await _requestsWrapper(data["url"], data["method"], data["body"], data["headers"])
                 lastStatus = req.status
+
                 if (req.status >= 200 && req.status < 300) {
                     result = req.data 
                     workingOnReq = false
@@ -171,6 +180,8 @@ async function _requestsWrapper(url,method,body=null,headers=null, timeout=60) {
         var result = await axios(httpConfig)
         return result     
 }
+
+//
 
 function _getIndex( arg, token) {
 
