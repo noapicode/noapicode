@@ -163,30 +163,17 @@ def _initActionData( actionId, data, inputParams, envId=None):
         global _actions
         global _envs
         if actionId not in _actions:
-            raise Exception("actionId Not Found")
+            raise Exception("actionId '" + actionId + "' is not found")
         
         data = copy.deepcopy(_actions[actionId])
         data["inputParams"] = inputParams
 
         if envId is not None:
+            if not (envId in _envs):
+                raise Exception('ENV: "' + envId + '" is not found.')
+
             for k in _envs[envId]:
                 data["inputParams"][k] = _envs[envId][k]
 
 
         return data
-''' 
-# Init APIGuy with Exported File
-api = APIConnectar("C:\\Users\\Addie\\Downloads\\nasa.json")
-
-# Configure Variables
-variables = {
-            "start_date":"2022-01-01", 
-            "key":"ifEwOeBlHMQArC0RLSJZ6NqtxeD9OakEECMjpckB"
-            }
-
-# Send API Request
-response = api.request("nasa", variables=variables)
-
-# Print API Response
-print(response)
-'''
