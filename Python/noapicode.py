@@ -6,15 +6,7 @@ import urllib.parse
 _actions = None
 _envs = None
 
-def load(pathToFile):
-    global _actions
-    global _envs
-    f = open(pathToFile)
-    fileJSON = json.load(f)
-    _actions = fileJSON["actions"]
-    _envs = fileJSON["env"]   
-
-def request(apiName, variables={}, env="default", folder="default"):
+def request(apiName, variables={}, env=None, folder="default"):
 
         data = _initActionData(folder + '/' + apiName, {}, variables, env)    
 
@@ -23,6 +15,14 @@ def request(apiName, variables={}, env="default", folder="default"):
         vendorResponse = _makeRequest(data)
 
         return vendorResponse
+    
+def load(pathToFile):
+    global _actions
+    global _envs
+    f = open(pathToFile)
+    fileJSON = json.load(f)
+    _actions = fileJSON["actions"]
+    _envs = fileJSON["env"]   
     
     # --
     # Get Input Ready for HTTP Request
@@ -159,7 +159,7 @@ def _getIndex( arg, token):
             return -1 
 
         
-def _initActionData( actionId, data, inputParams, envId=None):
+def _initActionData(actionId, data, inputParams, envId):
         global _actions
         global _envs
         if actionId not in _actions:
