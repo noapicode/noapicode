@@ -185,12 +185,16 @@ function _getIndex( arg, token) {
 function _initActionData( actionId, data, inputParams, envId=null) {
 
         if (!(actionId in _actions))
-            throw new Error("actionId Not Found")
+            throw new Error("actionId '" + actionId + "' is not found")
         
         data = _deepCopy(_actions[actionId])
         data["inputParams"] = inputParams
 
-        if (envId != null){
+        if (envId != null) {
+
+            if (!(envId in _envs))
+                throw new Error('ENV: "' + envId + '" is not found.')
+
             for (var k in _envs[envId]) {
                 data["inputParams"][k] = _envs[envId][k]
             }
