@@ -7,23 +7,7 @@ let _actions = null
 let _envs = null
 let _loadingFile = null
 
-async function load(pathToFile) {
-
-    _loadingFile = loadFile(pathToFile)
-    await _loadingFile
-    return "Successfully loaded " + pathToFile
-}
-
-async function loadFile(pathToFile) {
-        
-    var fileContent = await readFileAsync(pathToFile)
-    var fileJSON = JSON.parse(fileContent)
-    _actions = fileJSON["actions"]
-    _envs = fileJSON["env"]
-    return false
-}
-
-async function request(apiName, variables={}, env="default", folder="default") {
+async function request(apiName, variables={}, env=null, folder="default") {
 
         if (_loadingFile)
             await _loadingFile
@@ -36,6 +20,22 @@ async function request(apiName, variables={}, env="default", folder="default") {
         vendorResponse = await _makeRequest(data)
 
         return vendorResponse
+}
+
+async function load(pathToFile) {
+
+    _loadingFile = _loadFile(pathToFile)
+    await _loadingFile
+    return "Successfully loaded " + pathToFile
+}
+
+async function _loadFile(pathToFile) {
+        
+    var fileContent = await readFileAsync(pathToFile)
+    var fileJSON = JSON.parse(fileContent)
+    _actions = fileJSON["actions"]
+    _envs = fileJSON["env"]
+    return false
 }
 
 function _parseVariables(variable) {
@@ -193,7 +193,7 @@ function _getIndex( arg, token) {
      return -1 
  }
         
-function _initActionData( actionId, data, inputParams, envId=null) {
+function _initActionData( actionId, data, inputParams, envId) {
 
         if (!(actionId in _actions))
             throw new Error("actionId '" + actionId + "' is not found")
