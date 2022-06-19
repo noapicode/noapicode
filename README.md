@@ -1,6 +1,4 @@
-<img src="https://app.noapicode.com/logo.png" alt="drawing" width="250"/>
-
-# [NoAPIcode](https://www.noapicode.com/#/)
+No API Code!
 
 Consume API's with no code.
 
