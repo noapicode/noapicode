@@ -15,7 +15,7 @@ async function request(apiName, variables={}, env=null, folder="default") {
         if (!_actions)
             throw new Error("No Actions Loaded, First Call the 'load' method")
 
-        var data = _initActionData(folder + '/' + apiName, {}, variables, env)    
+        let data = _initActionData(folder + '/' + apiName, {}, variables, env)    
         _configureHTTPVariables(data)
         vendorResponse = await _makeRequest(data)
 
@@ -31,8 +31,8 @@ async function load(pathToFile) {
 
 async function _loadFile(pathToFile) {
         
-    var fileContent = await readFileAsync(pathToFile)
-    var fileJSON = JSON.parse(fileContent)
+    let fileContent = await readFileAsync(pathToFile)
+    let fileJSON = JSON.parse(fileContent)
     _actions = fileJSON["actions"]
     _envs = fileJSON["env"]
     return false
@@ -49,14 +49,15 @@ return object is
         "variableName2": [startIndex, endIndex],
     }
 */
-       tokens = {}
-       previousTotal = 0
+       let tokens = {}
+       let previousTotal = 0
 
        while (_getIndex(variable,"(") != -1) {
 
-          startIndex = _getIndex(variable,"(")
-          token = variable.substring(startIndex + 1)
-          endIndex = _getIndex(token,")")
+          let startIndex = _getIndex(variable,"(")
+          let token = variable.substring(startIndex + 1)
+          let endIndex = _getIndex(token,")")
+          
           token = token.substring(0,endIndex)
           tokens[token] = [startIndex + previousTotal, startIndex + endIndex + previousTotal]
           previousTotal += startIndex + endIndex
@@ -73,16 +74,16 @@ function _insertVariables(variableDict, valuesDict, str) {
          if we had x and we add xx then 2 - 1 is 1 and we add 1 
          len(varValue) - len (varName) is offset
 */
-        var newStr = str
-        var offset = 0
-        for (var i in variableDict) {
-            var value = ''
+        let newStr = str
+        let offset = 0
+        for (let i in variableDict) {
+            let value = ''
             if (i in valuesDict) {
                 value = valuesDict[i]
             }
 
-            rightIndex = variableDict[i][0] + offset
-            leftIndex = variableDict[i][1] + 2 + offset
+            let rightIndex = variableDict[i][0] + offset
+            let leftIndex = variableDict[i][1] + 2 + offset
             offset += ( value.length -  i.length)
 
             newStr = str.substring(0,rightIndex)
@@ -96,14 +97,14 @@ function _insertVariables(variableDict, valuesDict, str) {
 
 function _configureHTTPVariables( data) {
 
-        var urlVars = _parseVariables(data["url"])
+        let urlVars = _parseVariables(data["url"])
         data["url"] = _insertVariables(urlVars, data["inputParams"], data["url"])
         
         if (data["urlParams"] != null) {
 
             data["url"] += '?'
 
-            for (var k in data["urlParams"]) {
+            for (let k in data["urlParams"]) {
 
                 if (data["urlParams"][k] == null)
                     data["url"] += k + '=' + encodeURIComponent(data["inputParams"][k]) + "&"
@@ -119,13 +120,15 @@ function _configureHTTPVariables( data) {
         }
 
         if (data["headers"] != null) {
-            newHeaders = {}
+            let newHeaders = {}
             for (var k in data["headers"]) {
 
-                keyVars = _parseVariables(k)
-                newKey = _insertVariables(keyVars, data["inputParams"],k)
-                valueVars = _parseVariables(data["headers"][k])
-                newValue = _insertVariables(valueVars, data["inputParams"], data["headers"][k])
+                let keyVars = _parseVariables(k)
+                let newKey = _insertVariables(keyVars, data["inputParams"],k)
+                
+                let valueVars = _parseVariables(data["headers"][k])
+                let newValue = _insertVariables(valueVars, data["inputParams"], data["headers"][k])]
+                
                 newHeaders[newKey] = newValue
             }
             data["headers"] = newHeaders
@@ -135,18 +138,18 @@ function _configureHTTPVariables( data) {
 
 
 // Methods that make HTTP Request
-
+// TO DO: Fix thix >>
 async function _makeRequest(data,response=null) {
 
-        var currentAttempt = 0
-        var result = null
-        var workingOnReq = true
-        var lastStatus = null
-        var error = null
+        let currentAttempt = 0
+        let result = null
+        let workingOnReq = true
+        let lastStatus = null
+        let error = null
         while (currentAttempt - 1 < data["retry"] && workingOnReq) {
             
             try {
-                var req = await _requestsWrapper(data["url"], data["method"], data["body"], data["headers"])
+                let req = await _requestsWrapper(data["url"], data["method"], data["body"], data["headers"])
                 lastStatus = req.status
 
                 if (req.status >= 200 && req.status < 300) {
@@ -160,7 +163,7 @@ async function _makeRequest(data,response=null) {
             currentAttempt += 1
         }
         if (result == null)
-            throw new Error(err)
+            throw new Error(error)
         else {
             response = result
             return result
@@ -169,7 +172,7 @@ async function _makeRequest(data,response=null) {
 
 async function _requestsWrapper(url,method,body=null,headers=null, timeout=60) {
 
-        var httpConfig = {
+        let httpConfig = {
             method: method,
             url: url,
             data: body,
@@ -177,7 +180,7 @@ async function _requestsWrapper(url,method,body=null,headers=null, timeout=60) {
             timeout:timeout  * 1000
         }
 
-        var result = await axios(httpConfig)
+        let result = await axios(httpConfig)
         return result     
 }
 
@@ -206,7 +209,7 @@ function _initActionData( actionId, data, inputParams, envId) {
             if (!(envId in _envs))
                 throw new Error('ENV: "' + envId + '" is not found.')
 
-            for (var k in _envs[envId]) {
+            for (let k in _envs[envId]) {
                 data["inputParams"][k] = _envs[envId][k]
             }
         }
